@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Musik-Vorschläge</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h1 { color: #333; }
+    form { margin-bottom: 20px; }
+    input, button { padding: 10px; margin: 5px; }
+    .vorschlag { padding: 8px; border-bottom: 1px solid #ccc; }
+    .name { font-weight: bold; color: #444; }
+    .song { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>🎵 Musik-Vorschläge</h1>
+  <form id="vorschlagForm">
+    <input type="text" id="name" placeholder="Dein Name" required>
+    <input type="text" id="song" placeholder="Dein Musikvorschlag" required>
+    <button type="submit">Absenden</button>
+  </form>
+
+  <h2>Bisherige Vorschläge:</h2>
+  <div id="liste"></div>
+
+  <script>
+    const SCRIPT_URL = "HIER-DEINE-APPSCRIPT-URL-EINFÜGEN";
+
+    async function laden() {
+      const res = await fetch(SCRIPT_URL);
+      const daten = await res.json();
+      const liste = document.getElementById("liste");
+      liste.innerHTML = "";
+      daten.forEach(v => {
+        const div = document.createElement("div");
+        div.className = "vorschlag";
+        div.innerHTML = `<span class="name">${v.name}:</span> <span class="song">${v.song}</span>`;
+        liste.appendChild(div);
+      });
+    }
+
+    document.getElementById("vorschlagForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const song = document.getElementById("song").value.trim();
+      if (name && song) {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, song })
+        });
+        document.getElementById("vorschlagForm").reset();
+        laden();
+      }
+    });
+
+    laden();
+  </script>
+</body>
+</html>
